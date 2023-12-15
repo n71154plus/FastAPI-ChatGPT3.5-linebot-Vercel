@@ -52,7 +52,7 @@ class HuggingChat:
     def get_response(self, user_input):
         self.chatbot.switch_llm(2)
         response = self.chatbot.chat(
-	            text=f"{user_input}",
+	            text=user_input,
                 _stream_yield_all=True,
                 conversation=self.conversation,
         )
