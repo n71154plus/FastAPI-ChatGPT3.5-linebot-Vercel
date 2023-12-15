@@ -45,6 +45,7 @@ class HuggingChat:
         self.sign = Login(email, passwd)
         self.cookies = self.sign.login()
         self.chatbot = hugchat.ChatBot(cookies=self.cookies.get_dict())
+        self.chatbot.switch_llm(2)
 
     def get_response(self, user_input):     
         response = self.chatbot.chat(
