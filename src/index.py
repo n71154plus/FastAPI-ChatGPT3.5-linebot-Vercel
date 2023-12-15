@@ -44,8 +44,7 @@ class HuggingChat:
     def __init__(self):
         self.sign = Login(email, passwd)
         self.cookies = self.sign.login()
-        self.chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-        self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo")
+        self.chatbot = hugchat.ChatBot(cookies=self.cookies.get_dict())
 
     def get_response(self, user_input):     
         response = self.chatbot.query(
