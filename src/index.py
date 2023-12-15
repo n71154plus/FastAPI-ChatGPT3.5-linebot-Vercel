@@ -47,9 +47,11 @@ class HuggingChat:
         self.chatbot = hugchat.ChatBot(cookies=self.cookies.get_dict())
 
     def get_response(self, user_input):     
-        response = self.chatbot.query(
-	            user_input
-                )        
+        response = self.chatbot.chat(
+	            text=user_input,
+                    _stream_yield_all=True
+        )
+        response.wait_until_done()
         return response.text
 
 hugging_chat = HuggingChat()
