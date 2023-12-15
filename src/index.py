@@ -31,49 +31,31 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = FastAPI()
 ################################################################
-import openai, os
-	
-openai.api_key = os.getenv("OPENAI_API_KEY")
+from hugchat import hugchat
+from hugchat.login import Login
+import os
+
+email = os.getenv("HUGGING_ID")
+passwd = os.getenv("HUGGING_PASSWORD")
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET")) 
 
-
-	
-conversation = []
-
-class ChatGPT:  
-    
-
+class HuggingChat:  
     def __init__(self):
-        
-        self.messages = conversation
+        self.sign = Login(email, passwd)
+	self.cookies = sign.login()
+	self.chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
         self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo")
 
 
 
-    def get_response(self, user_input):
-        conversation.append({"role": "user", "content": user_input})
-        
+    def get_response(self, user_input):     
+        response = self.chatbot.query(
+	            text=self.messages
+                )        
+        return response.text
 
-        response = openai.ChatCompletion.create(
-	            model=self.model,
-                messages = self.messages
-
-                )
-
-        conversation.append({"role": "assistant", "content": response['choices'][0]['message']['content']})
-        
-        print("AI回答內容：")        
-        print(response['choices'][0]['message']['content'].strip())
-
-
-        
-        return response['choices'][0]['message']['content'].strip()
-	
-
-
-
-chatgpt = ChatGPT()
+hugging_chat = HuggingChat()
 
 
 # Line Bot config
@@ -107,7 +89,7 @@ def handling_message(event):
         user_message = event.message.text
 
 
-        reply_msg = chatgpt.get_response(user_message)
+        reply_msg = hugging_chat.get_response(user_message)
         
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
 
