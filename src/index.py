@@ -45,12 +45,16 @@ class HuggingChat:
         self.sign = Login(email, passwd)
         self.cookies = self.sign.login()
         self.chatbot = hugchat.ChatBot(cookies=self.cookies.get_dict())
+        self.chatbot.delete_all_conversations()
+        self.conversation = self.chatbot.new_conversation(2)
         self.chatbot.switch_llm(2)
 
-    def get_response(self, user_input):     
+    def get_response(self, user_input):
+        self.chatbot.switch_llm(2)
         response = self.chatbot.chat(
 	            text=f"{user_input} 請用中文回答我",
-                    _stream_yield_all=True
+                _stream_yield_all=True,
+                conversation=self.conversation,
         )
         response.wait_until_done()
         return response.text
