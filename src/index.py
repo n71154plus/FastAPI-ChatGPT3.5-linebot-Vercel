@@ -48,7 +48,7 @@ class HuggingChat:
 
     def get_response(self, user_input):     
         response = self.chatbot.query(
-	            text=user_input
+	            user_input
                 )        
         return response.text
 
@@ -87,8 +87,13 @@ def handling_message(event):
 
 
         reply_msg = hugging_chat.get_response(user_message)
+        if reply_msg:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
+        else:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=user_message))
+
+	    
         
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
 
 
 
