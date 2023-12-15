@@ -48,7 +48,7 @@ class HuggingChat:
 
     def get_response(self, user_input):     
         response = self.chatbot.chat(
-	            text=user_input,
+	            text=f"{user_input} 請用中文回答我",
                     _stream_yield_all=True
         )
         response.wait_until_done()
