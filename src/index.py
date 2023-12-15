@@ -48,7 +48,7 @@ class HuggingChat:
 
     def get_response(self, user_input):     
         response = self.chatbot.query(
-	            text=self.messages
+	            text=user_input
                 )        
         return response.text
 
