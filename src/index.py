@@ -43,11 +43,9 @@ handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 class HuggingChat:  
     def __init__(self):
         self.sign = Login(email, passwd)
-	self.cookies = self.sign.login()
-	self.chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
+        self.cookies = self.sign.login()
+        self.chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
         self.model = os.getenv("OPENAI_MODEL", default = "gpt-3.5-turbo")
-
-
 
     def get_response(self, user_input):     
         response = self.chatbot.query(
