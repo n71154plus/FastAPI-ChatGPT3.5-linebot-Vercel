@@ -20,16 +20,14 @@ async def say_hello(name: str):
 
 '''
 from fastapi import FastAPI, Request, HTTPException
-
 from linebot import LineBotApi, WebhookHandler
-
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 app = FastAPI()
 ################################################################
 from hugchat import hugchat
 from hugchat.login import Login
-import os
+import os, time
 email = os.getenv("HUGGING_ID")
 passwd = os.getenv("HUGGING_PASSWORD")
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
@@ -47,8 +45,7 @@ class HuggingChat:
                 _stream_yield_all=True,
                 conversation=self.conversation,
         )
-        response.wait_until_done()
-        return response.text
+        return response
 hugging_chat = HuggingChat()
 # Line Bot config
 @app.get("/")
@@ -69,9 +66,12 @@ async def callback(request: Request):
 @handler.add(MessageEvent, message=TextMessage)
 def handling_message(event):
     if isinstance(event.message, TextMessage):
+        start_time = time.time()
         user_message = event.message.text
         reply_msg = hugging_chat.get_response(user_message)
-        if reply_msg:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
-        else:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=user_message))
+        total_text = ""
+        for resp in reply_msg:
+            elapsed_time = time.time() - start_time
+            total_text = total_text + resp
+            if elapsed_time >= 3:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
