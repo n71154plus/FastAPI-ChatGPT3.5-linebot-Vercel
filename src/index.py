@@ -69,7 +69,7 @@ def process_message(user_message,total_text,user_id,event):
         if resp['type'] == 'stream':
             total_text = f"{total_text}{resp['token']}"
     with open(f'{user_id}.txt', 'w') as file:
-    file.write(total_text)
+        file.write(total_text)
     
 @handler.add(MessageEvent, message=TextMessage)
 def handling_message(event):
