@@ -74,7 +74,7 @@ def handling_message(event):
             ]
         )
         if event.message.text == event.source.user_id:
-            if file_exists(f'{event.source.user_id}.txt'):
+            if os.path.exists(f'{event.source.user_id}.txt'):
                 with open(file_path, 'r') as file:
                     file_content = file.read()
                     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=file_content))
