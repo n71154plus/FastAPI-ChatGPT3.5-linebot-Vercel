@@ -72,7 +72,8 @@ def handling_message(event):
         total_text = ""
         for resp in reply_msg:
             elapsed_time = time.time() - start_time
-            total_text = f"{total_text}{resp}"
+            if resp['type'] == 'stream':
+                total_text = f"{total_text}{resp['token']}"
             if elapsed_time >= 3:
                 break
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
