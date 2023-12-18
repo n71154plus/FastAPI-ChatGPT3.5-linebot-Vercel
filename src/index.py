@@ -70,7 +70,7 @@ def handling_message(event):
         profile = line_bot_api.get_profile(event.source.user_id)
         quick_reply=QuickReply(items=
             [
-                QuickReplyButton(action=MessageAction(label=f'我還在思考{profile.display_name}的問題中，點擊我回答您的問題', text=f'{event.source.user_id}')),
+                QuickReplyButton(action=MessageAction(label='點擊我，詢問我想好了沒', text=f'{event.source.user_id}')),
             ]
         )
         if event.message.text == event.source.user_id:
@@ -80,7 +80,7 @@ def handling_message(event):
                     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=file_content))
                 os.remove(f'{event.source.user_id}.txt')
             else:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請再等一下，我還在思考您的問題', quick_reply = quick_reply))
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
             return
         user_message = event.message.text
         reply_msg = hugging_chat.get_response(user_message)
@@ -90,7 +90,7 @@ def handling_message(event):
             if resp['type'] == 'stream':
                 total_text = f"{total_text}{resp['token']}"
             if elapsed_time > 3:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請再等一下，我還在思考您的問題', quick_reply = quick_reply))
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
         if elapsed_time <= 3:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
         else:
