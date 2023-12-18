@@ -85,12 +85,14 @@ def handling_message(event):
         user_message = event.message.text
         reply_msg = hugging_chat.get_response(user_message)
         total_text = ""
+        issend = False
         for resp in reply_msg:
             elapsed_time = time.time() - start_time
             if resp['type'] == 'stream':
                 total_text = f"{total_text}{resp['token']}"
-            if elapsed_time > 3:
+            if elapsed_time > 3 and issend == False :
                 print('運算超過3秒')
+                issend = True
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
         if elapsed_time <= 3:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
