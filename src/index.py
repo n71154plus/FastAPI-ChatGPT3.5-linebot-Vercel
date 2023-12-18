@@ -66,13 +66,13 @@ async def callback(request: Request):
 @handler.add(MessageEvent, message=TextMessage)
 def handling_message(event):
     if isinstance(event.message, TextMessage):
+        start_time = time.time()
+        profile = line_bot_api.get_profile(event.source.user_id)
         quick_reply=QuickReply(items=
             [
                 QuickReplyButton(action=MessageAction(label=f'我還在思考{profile.display_name}的問題中，點擊我回答您的問題', text=f'{event.source.user_id}')),
             ]
         )
-        start_time = time.time()
-        profile = line_bot_api.get_profile(event.source.user_id)
         if event.message.text == event.source.user_id:
             if file_exists(f'{event.source.user_id}.txt'):
                 with open(file_path, 'r') as file:
