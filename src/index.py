@@ -90,9 +90,11 @@ def handling_message(event):
             if resp['type'] == 'stream':
                 total_text = f"{total_text}{resp['token']}"
             if elapsed_time > 3:
+                print('運算超過3秒')
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
         if elapsed_time <= 3:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
         else:
+            print('運算結束了')
             with open(f'{event.source.user_id}.txt', 'w') as file:
                 file.write(total_text)
