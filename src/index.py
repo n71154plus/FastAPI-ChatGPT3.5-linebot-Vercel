@@ -98,6 +98,6 @@ def handling_message(event):
         worker.start()
         if completion_event.wait(timeout=3):
             new_text=total_text[0]
-            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=new_text))
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
