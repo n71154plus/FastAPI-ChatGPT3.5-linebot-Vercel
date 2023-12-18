@@ -68,6 +68,7 @@ def process_message(user_message,total_text,user_id,event):
     for resp in reply_msg:
         if resp['type'] == 'stream':
             total_text = f"{total_text}{resp['token']}"
+    event.set()
     with open(f'{user_id}.txt', 'w') as file:
         file.write(total_text)
     
