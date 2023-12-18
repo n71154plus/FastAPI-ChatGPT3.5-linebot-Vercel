@@ -68,9 +68,9 @@ def process_message(user_message,total_text,user_id,event):
     for resp in reply_msg:
         if resp['type'] == 'stream':
             total_text[0] = f"{total_text[0]}{resp['token']}"
-    event.set()
     with open(f'/tmp/{user_id}.txt', 'w') as file:
         file.write(total_text[0])
+    event.set()
     
 @handler.add(MessageEvent, message=TextMessage)
 def handling_message(event):
@@ -98,6 +98,7 @@ def handling_message(event):
         worker.start()
         if completion_event.wait(timeout=3):
             new_text=total_text[0]
+            os.remove(f'/tmp/{event.source.user_id}.txt')
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=new_text))
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
