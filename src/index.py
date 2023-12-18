@@ -90,7 +90,7 @@ def handling_message(event):
             if resp['type'] == 'stream':
                 total_text = f"{total_text}{resp['token']}"
             if elapsed_time > 3:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=text='請再等一下，我還在思考您的問題', quick_reply = quick_reply))
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請再等一下，我還在思考您的問題', quick_reply = quick_reply))
         if elapsed_time <= 3:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
         else:
