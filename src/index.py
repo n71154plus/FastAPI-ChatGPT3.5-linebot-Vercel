@@ -74,4 +74,5 @@ def handling_message(event):
             elapsed_time = time.time() - start_time
             total_text = f"{total_text}{resp}"
             if elapsed_time >= 3:
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
+                break
+	line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
