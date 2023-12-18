@@ -27,7 +27,7 @@ app = FastAPI()
 ################################################################
 from hugchat import hugchat
 from hugchat.login import Login
-import os, time
+import os, time, threading
 email = os.getenv("HUGGING_ID")
 passwd = os.getenv("HUGGING_PASSWORD")
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
@@ -63,6 +63,14 @@ async def callback(request: Request):
     except InvalidSignatureError:
         raise HTTPException(status_code=400, detail="Missing Parameters")
     return "OK"
+def process_message(user_message,total_text,user_id,event):
+    reply_msg = hugging_chat.get_response(user_message)
+    for resp in reply_msg:
+        if resp['type'] == 'stream':
+            total_text = f"{total_text}{resp['token']}"
+    with open(f'{user_id}.txt', 'w') as file:
+    file.write(total_text)
+    
 @handler.add(MessageEvent, message=TextMessage)
 def handling_message(event):
     if isinstance(event.message, TextMessage):
@@ -83,20 +91,11 @@ def handling_message(event):
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
             return
         user_message = event.message.text
-        reply_msg = hugging_chat.get_response(user_message)
         total_text = ""
-        issend = False
-        for resp in reply_msg:
-            elapsed_time = time.time() - start_time
-            if resp['type'] == 'stream':
-                total_text = f"{total_text}{resp['token']}"
-            if elapsed_time > 3 and issend == False :
-                print('運算超過3秒')
-                issend = True
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
-        if elapsed_time <= 3:
+        completion_event = threading.Event()
+        worker = threading.Thread(target=process_message, args=(user_message, total_text, event.source.user_id, completion_event))
+        worker.start()
+        if completion_event.wait(timeout=3):
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
         else:
-            print('運算結束了')
-            with open(f'{event.source.user_id}.txt', 'w') as file:
-                file.write(total_text)
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
