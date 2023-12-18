@@ -67,10 +67,10 @@ def process_message(user_message,total_text,user_id,event):
     reply_msg = hugging_chat.get_response(user_message)
     for resp in reply_msg:
         if resp['type'] == 'stream':
-            total_text = f"{total_text}{resp['token']}"
+            total_text[0] = f"{total_text[0]}{resp['token']}"
     event.set()
-    with open(f'{user_id}.txt', 'w') as file:
-        file.write(total_text)
+    with open(f'/tmp/{user_id}.txt', 'w') as file:
+        file.write(total_text[0])
     
 @handler.add(MessageEvent, message=TextMessage)
 def handling_message(event):
@@ -83,20 +83,21 @@ def handling_message(event):
             ]
         )
         if event.message.text == event.source.user_id:
-            if os.path.exists(f'{event.source.user_id}.txt'):
-                with open(file_path, 'r') as file:
+            if os.path.exists(f'/tmp/{event.source.user_id}.txt'):
+                with open(f'/tmp/{event.source.user_id}.txt', 'r') as file:
                     file_content = file.read()
                     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=file_content))
-                os.remove(f'{event.source.user_id}.txt')
+                os.remove(f'/tmp/{event.source.user_id}.txt')
             else:
                 line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
             return
         user_message = event.message.text
-        total_text = ""
+        total_text = [""]
         completion_event = threading.Event()
         worker = threading.Thread(target=process_message, args=(user_message, total_text, event.source.user_id, completion_event))
         worker.start()
         if completion_event.wait(timeout=3):
+            new_text=total_text[0]
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=total_text))
         else:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'請再等等\n我還在思考{profile.display_name}的問題中', quick_reply = quick_reply))
