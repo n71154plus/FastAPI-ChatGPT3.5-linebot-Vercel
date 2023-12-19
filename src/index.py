@@ -44,7 +44,6 @@ class HuggingChat:
 	            text = user_input,
                 _stream_yield_all = True,
                 conversation = self.conversation,
-                web_search = True,
         )
         return response
 hugging_chat = HuggingChat()
