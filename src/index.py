@@ -41,9 +41,10 @@ class HuggingChat:
 
     def get_response(self, user_input):
         response = self.chatbot.chat(
-	            text=user_input,
-                _stream_yield_all=True,
-                conversation=self.conversation,
+	            text = user_input,
+                _stream_yield_all = True,
+                conversation = self.conversation,
+                web_search = True,
         )
         return response
 hugging_chat = HuggingChat()
