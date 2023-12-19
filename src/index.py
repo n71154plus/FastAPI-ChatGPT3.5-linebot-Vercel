@@ -97,7 +97,7 @@ def handling_message(event):
         completion_event = threading.Event()
         worker = threading.Thread(target=process_message, args=(user_message, total_text, event.source.user_id, completion_event))
         worker.start()
-        if completion_event.wait(timeout=30):
+        if completion_event.wait(timeout=10):
             new_text=total_text[0]
             os.remove(f'/tmp/{event.source.user_id}.txt')
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=new_text))
